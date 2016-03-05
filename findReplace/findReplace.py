@@ -63,7 +63,7 @@ def __replacelogger(s, classname):
     return s
 
 def __replaceimport(s, classname):
-    return s.replace("import com.intuit.util.Log;\n", "import org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n")
+    return s.replace("import com.abc.util.Log;\n", "import org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n")
 
 def __mergetoaline(filepath):
     with open(filepath) as f:
@@ -138,7 +138,7 @@ def main(directory):
 
 if __name__ == '__main__':
     # unittest.main()
-    directory =  sys.argv[1] if len(sys.argv) > 1 else "com/intuit/qbo/bl/"
+    directory =  sys.argv[1] if len(sys.argv) > 1 else "."
     print directory
     main(directory)
 
