@@ -5,7 +5,7 @@ import sys
 
 levels = {'info': 'info', 'error': 'error', 'warning': 'warn', 'debug': 'debug'}
 
-def replaceLoggingStmts(directory, filePattern):
+def replaceLoggingStmts(directory, logger_class, filePattern):
     for path, dirs, files in os.walk(os.path.abspath(directory)):
         for filename in fnmatch.filter(files, filePattern):
             classname = filename.replace(".java", "")
@@ -36,7 +36,7 @@ def replaceLoggingStmts(directory, filePattern):
 
                     # Step 2
                     # change import statements for slf
-                    s = __replaceimport(s, classname)
+                    s = __replaceimport(s, logger_class, classname)
 
                     # Step 3
                     #replace Log.info/error/warn/fatal(this, ...)
@@ -62,8 +62,8 @@ def __replacelogger(s, classname):
         s = re.sub(oldLogger + oldLevel + "\s*\(", newLogger + newLevel + "(", s)
     return s
 
-def __replaceimport(s, classname):
-    return s.replace("import com.abc.util.Log;\n", "import org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n")
+def __replaceimport(s, classname, logger_class):
+    return s.replace("import "+logger_class+";\n", "import org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n")
 
 def __mergetoaline(filepath):
     with open(filepath) as f:
@@ -93,7 +93,7 @@ def __trimwhitespace(filepath):
     with open(filepath, "w") as g:
         g.writelines(data)
 
-def formatLoggingStmts(directory, filePattern):
+def formatLoggingStmts(directory, logger_package_name, filePattern):
     for path, dirs, files in os.walk(os.path.abspath(directory)):
         for filename in fnmatch.filter(files, filePattern):
             filepath = os.path.join(path, filename)
@@ -131,16 +131,17 @@ def formatLoggingStmts(directory, filePattern):
                 # with open(filepath, "w") as g:
                 #     g.writelines(data)
 
-def main(directory):
-    replaceLoggingStmts(directory, "*.java")
-    formatLoggingStmts(directory, "*.java")
+def main(directory, logger_class):
+    replaceLoggingStmts(directory, logger_class, "*.java")
+    formatLoggingStmts(directory, logger_class, "*.java")
 
 
 if __name__ == '__main__':
     # unittest.main()
-    directory =  sys.argv[1] if len(sys.argv) > 1 else "."
+    directory =  sys.argv[1] 
+    logger_class = sys.argv[2]
     print directory
-    main(directory)
+    main(directory, logger_class)
 
 
 
